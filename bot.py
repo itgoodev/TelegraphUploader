@@ -27,7 +27,7 @@ except:
 
 if (apiid != None and apihash!= None and bottoken != None):
     try:
-        BotzHub = TelegramClient('bot', apiid, apihash).start(bot_token=bottoken)
+        Trident = TelegramClient('bot', apiid, apihash).start(bot_token=bottoken)
     except Exception as e:
         print(f"ERROR!\n{str(e)}")
         print("Bot is quiting...")
@@ -41,7 +41,7 @@ else:
 async def check_user(id):
     ok = True
     try:
-        await BotzHub(GetParticipantRequest(channel='@ChannelTrident', user_id=id))
+        await Trident(GetParticipantRequest(channel='@ChannelTrident', user_id=id))
         ok = True
     except UserNotParticipantError:
         ok = False
@@ -49,7 +49,7 @@ async def check_user(id):
 
 @Trident.on(events.NewMessage(incoming=True, pattern="/start", func=lambda e: e.is_private))
 async def start(event):
-    ok = await BotzHub(GetFullUserRequest(event.sender_id))
+    ok = await Trident(GetFullUserRequest(event.sender_id))
     await event.reply(f"Hello {ok.user.first_name}!\nI am a telegraph uploader bot.",
                      buttons=[
                          Button.inline("Help", data="help"),
@@ -58,7 +58,7 @@ async def start(event):
 
 @Trident.on(events.callbackquery.CallbackQuery(data="help"))
 async def _(event):
-    ok = await BotzHub(GetFullUserRequest(event.sender_id))
+    ok = await Trident(GetFullUserRequest(event.sender_id))
     if (await check_user(event.sender_id)) == False:
         return await event.edit(f"{ok.user.first_name}, please join my channel to use me!", buttons=[Button.url("Join Channel", url="https://t.me/ChannelTrident")])
     await event.edit(f"Send me a picture and I will upload it to Telegraph!\n\n~ @ChannelTrident")
@@ -72,7 +72,7 @@ async def uploader(event):
         os.makedirs(TMP_DOWNLOAD_DIRECTORY)
     pic = event.media
     ok = await event.reply("`Downloading...`")
-    downloaded_file_name = await BotzHub.download_media(pic, TMP_DOWNLOAD_DIRECTORY)
+    downloaded_file_name = await Trident.download_media(pic, TMP_DOWNLOAD_DIRECTORY)
     if downloaded_file_name.endswith((".webp")):
         await ok.edit("`Oh! It's a sticker...\nLemme convert it!!`")
         resize_image(downloaded_file_name)
