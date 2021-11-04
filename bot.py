@@ -1,6 +1,3 @@
-# Part of < https://github.com/xditya/TelegraphUploader >
-# (c) 2021 @xditya.
-
 import os
 import logging
 from PIL import Image
@@ -27,7 +24,7 @@ except:
 
 if (apiid != None and apihash!= None and bottoken != None):
     try:
-        Trident = TelegramClient('bot', apiid, apihash).start(bot_token=bottoken)
+        BotzHub = TelegramClient('bot', apiid, apihash).start(bot_token=bottoken)
     except Exception as e:
         print(f"ERROR!\n{str(e)}")
         print("Bot is quiting...")
@@ -41,38 +38,38 @@ else:
 async def check_user(id):
     ok = True
     try:
-        await Trident(GetParticipantRequest(channel='@ChannelTrident', user_id=id))
+        await BotzHub(GetParticipantRequest(channel='@ChannelTrident', user_id=id))
         ok = True
     except UserNotParticipantError:
         ok = False
     return ok
 
-@Trident.on(events.NewMessage(incoming=True, pattern="/start", func=lambda e: e.is_private))
+@BotzHub.on(events.NewMessage(incoming=True, pattern="/start", func=lambda e: e.is_private))
 async def start(event):
-    ok = await Trident(GetFullUserRequest(event.sender_id))
+    ok = await BotzHub(GetFullUserRequest(event.sender_id))
     await event.reply(f"Hello {ok.user.first_name}!\nI am a telegraph uploader bot.",
                      buttons=[
                          Button.inline("Help", data="help"),
                          Button.url("Dev", url="https://t.me/ChannelTrident")
                      ])
 
-@Trident.on(events.callbackquery.CallbackQuery(data="help"))
+@BotzHub.on(events.callbackquery.CallbackQuery(data="help"))
 async def _(event):
-    ok = await Trident(GetFullUserRequest(event.sender_id))
+    ok = await BotzHub(GetFullUserRequest(event.sender_id))
     if (await check_user(event.sender_id)) == False:
         return await event.edit(f"{ok.user.first_name}, please join my channel to use me!", buttons=[Button.url("Join Channel", url="https://t.me/ChannelTrident")])
     await event.edit(f"Send me a picture and I will upload it to Telegraph!\n\n~ @ChannelTrident")
 
-@Trident.on(events.NewMessage(incoming=True, func=lambda e: e.is_private and e.media))
+@BotzHub.on(events.NewMessage(incoming=True, func=lambda e: e.is_private and e.media))
 async def uploader(event):
     if (await check_user(event.sender_id)) is False:
         return
-    TMP_DOWNLOAD_DIRECTORY = "./ChannelTrident/"
+    TMP_DOWNLOAD_DIRECTORY = "./BotzHub/"
     if not os.path.isdir(TMP_DOWNLOAD_DIRECTORY):
         os.makedirs(TMP_DOWNLOAD_DIRECTORY)
     pic = event.media
     ok = await event.reply("`Downloading...`")
-    downloaded_file_name = await Trident.download_media(pic, TMP_DOWNLOAD_DIRECTORY)
+    downloaded_file_name = await BotzHub.download_media(pic, TMP_DOWNLOAD_DIRECTORY)
     if downloaded_file_name.endswith((".webp")):
         await ok.edit("`Oh! It's a sticker...\nLemme convert it!!`")
         resize_image(downloaded_file_name)
@@ -96,4 +93,4 @@ def resize_image(image):
 
 print("Bot has started.")
 print("Do visit @ChannelTrident..")
-Trident.run_until_disconnected()
+BotzHub.run_until_disconnected()
