@@ -1,1 +1,1 @@
-Trident: python bot.py
+BotzHub: python bot.py
